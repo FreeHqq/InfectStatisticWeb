@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>疫情统计曲线图</title>
+    <script src="../js/jquery.js"></script>
     <script src="../js/echarts.js"></script>
     <script src="../js/logData.js"></script>
     <script src="../js/utils.js"></script>
@@ -11,12 +12,50 @@
 
 <body>
     <!--为echarts准备一个容器，画图就画在里面-->
-    <div id="box" style="width: 600px;height: 600px;"></div>
+    <div id="box" style="width: 800px;height: 600px;"></div>
+    <input type="radio" name="type" id="type-infected" value="1"><label for="type-infected">新增/累计感染</label>
+    <input type="radio" name="type" id="type-death-cure" value="2"><label for="type-death-cure">累计死亡/治愈</label>
     <script>
         const params = new URLSearchParams(location.search)
-        let province = params.get('province')
-        window.onload = function () {
-        }
+        let province = params.get('province') || '全国'
+        
+        $('input[name="type"]').change(e => {
+            myChart.showLoading()
+            console.log(e);
+            
+            let data = [], legend = []
+            if (e.target.value == 1) {
+                data = [{
+                    name: '新增确诊',
+                    type: 'line',
+                    data: augmentInfectedRecord
+                }, {
+                    name: '累计确诊',
+                    type: 'line',
+                    data: aggregateInfectedRecord
+                }]
+                legend = ['新增确诊', '累计确诊']
+            } else {
+                data = [{
+                    name: '累计治愈',
+                    type: 'line',
+                    data: aggregateCureRecord
+                }, {
+                    name: '累计死亡',
+                    type: 'line',
+                    data: aggregateDeathRecord  
+                }]
+                legend = ['累计治愈', '累计死亡']
+            }
+            option.legend.data = legend
+            option.series = data
+            myChart.setOption(option, true)
+            setTimeout(() => {
+                myChart.hideLoading()
+            }, 500);
+        })
+
+
         const augmentInfectedRecord = getStatisticData(2, 'infected', province)
         const aggregateInfectedRecord = getStatisticData(1, 'infected', province)
         const aggregateCureRecord = getStatisticData(1, 'cure', province)
@@ -28,7 +67,7 @@ console.log(augmentInfectedRecord, aggregateInfectedRecord, aggregateDeathRecord
         var option = {
             //标题
             title: {
-                text: province + '省疫情统计'
+                text: province + '疫情统计'
             },
             //工具箱
             //保存图片
@@ -73,6 +112,7 @@ console.log(augmentInfectedRecord, aggregateInfectedRecord, aggregateDeathRecord
         };
         //使用刚刚指定的配置项和数据项显示图表
         myChart.setOption(option);
+        window.o = option
     </script>
 </body>
 
