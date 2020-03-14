@@ -60,8 +60,8 @@
         const aggregateInfectedRecord = getStatisticData(1, 'infected', province)
         const aggregateCureRecord = getStatisticData(1, 'cure', province)
         const aggregateDeathRecord = getStatisticData(1, 'death', province)
-console.log(augmentInfectedRecord, aggregateInfectedRecord, aggregateDeathRecord, aggregateCureRecord)
-        //初始化ehcharts实例
+        console.log(augmentInfectedRecord, aggregateInfectedRecord, aggregateDeathRecord, aggregateCureRecord)
+            //初始化ehcharts实例
         var myChart = echarts.init(document.getElementById("box"));
         //指定图表的配置项和数据
         var option = {
@@ -79,9 +79,24 @@ console.log(augmentInfectedRecord, aggregateInfectedRecord, aggregateDeathRecord
                     }
                 }
             },
+            //悬浮显示数据
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                },
+                formatter: function(params) {
+                    let firstParams = params[0];
+                    return firstParams.name + '<br>' + firstParams.seriesName + '  ' + firstParams.data;
+                }
+            },
             //图例-每一条数据的名字叫销量
             legend: {
-                data: ['新增确诊', '累计确诊', '累计治愈', '累计死亡']
+                data: ['新增确诊', '累计确诊', '累计治愈', '累计死亡'],
+                // selectedMode: 'single',
             },
             //x轴
             xAxis: {
@@ -105,7 +120,7 @@ console.log(augmentInfectedRecord, aggregateInfectedRecord, aggregateDeathRecord
                 }, {
                     name: '累计死亡',
                     type: 'line',
-                    data: aggregateDeathRecord  
+                    data: aggregateDeathRecord
                 }
 
             ]
