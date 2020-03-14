@@ -1,23 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
 
 <head>
     <meta charset="UTF-8">
     <title>疫情统计曲线图</title>
     <script src="../js/echarts.js"></script>
+    <script src="../js/logData.js"></script>
+    <script src="../js/utils.js"></script>
 </head>
 
 <body>
     <!--为echarts准备一个容器，画图就画在里面-->
     <div id="box" style="width: 600px;height: 600px;"></div>
     <script>
+        const params = new URLSearchParams(location.search)
+        let province = params.get('province')
+        window.onload = function () {
+        }
+        const augmentInfectedRecord = getStatisticData(2, 'infected', province)
+        const aggregateInfectedRecord = getStatisticData(1, 'infected', province)
+        const aggregateCureRecord = getStatisticData(1, 'cure', province)
+        const aggregateDeathRecord = getStatisticData(1, 'death', province)
+console.log(augmentInfectedRecord, aggregateInfectedRecord, aggregateDeathRecord, aggregateCureRecord)
         //初始化ehcharts实例
         var myChart = echarts.init(document.getElementById("box"));
         //指定图表的配置项和数据
         var option = {
             //标题
             title: {
-                text: '疫情统计'
+                text: province + '省疫情统计'
             },
             //工具箱
             //保存图片
@@ -35,7 +46,7 @@
             },
             //x轴
             xAxis: {
-                data: ["1.27", "1.30", "2.2", "2.11", "2.20", "3.6"]
+                data: ["01.19", "01.20", "01.21", "01.22", "01.23", "01.24", "01.25", "01.26", "01.27", "01.28", "01.29", "01.30", "01.31", "02.01", "02.02"]
             },
             //y轴没有显式设置，根据值自动生成y轴
             yAxis: {},
@@ -43,19 +54,19 @@
             series: [{
                     name: '新增确诊',
                     type: 'line',
-                    data: [40, 200, 3000, 15000, 1200, 10]
+                    data: augmentInfectedRecord
                 }, {
                     name: '累计确诊',
                     type: 'line',
-                    data: [50, 250, 5000, 30000, 40000, 42000]
+                    data: aggregateInfectedRecord
                 }, {
                     name: '累计治愈',
                     type: 'line',
-                    data: [10, 90, 2300, 9000, 30000, 39000]
+                    data: aggregateCureRecord
                 }, {
                     name: '累计死亡',
                     type: 'line',
-                    data: [2, 30, 280, 670, 1200, 31250]
+                    data: aggregateDeathRecord  
                 }
 
             ]
