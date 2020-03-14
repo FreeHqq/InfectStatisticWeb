@@ -1,4 +1,4 @@
-var myChart = echarts.init(document.getElementById('main'));
+const myChart = echarts.init(document.getElementById('main'));
 const provinces = ["南海诸岛", "北京", "天津", "上海", "重庆", "河北", "河南", "云南", "辽宁", "黑龙江", "湖南", "安徽", "山东", "新疆", "江苏", "浙江", "江西", "湖北", "广西", "甘肃", "山西", "内蒙古", "陕西", "吉林", "福建", "贵州", "广东", "青海", "西藏", "四川", "宁夏", "海南", "台湾", "香港", "澳门"]
 let dataList = provinces.map(v => ({
     name: v,
@@ -16,10 +16,11 @@ window.onload = function () {
 }
 
 $('#date-picker').on('change', e => {
-    const newDate = e.target.value
-    dataList = provinces.map(v => ({
-        name: v,
-        value: getSpecifiedData(1, v, newDate).infected
+    const newDate = e.target.value,
+          type = $('#type-picker').val()
+    dataList = provinces.map(provinceName => ({
+        name: provinceName,
+        value: getSpecifiedData(type, provinceName, newDate).infected
     }))
     option.series[0].data = dataList
     let max = Math.max(...dataList.map(v => v.value), 50)
@@ -27,13 +28,23 @@ $('#date-picker').on('change', e => {
     option.visualMap.max = max
     myChart.setOption(option)
 })
+$('#type-picker').on('change', e => {
+    const newType = e.target.value
+    const date = $('#date-picker').val()
+    dataList = provinces.map(provinceName => ({
+        name: provinceName,
+        value: getSpecifiedData(newType, provinceName, date).infected
+    }))
+    option.series[0].data = dataList
+    option.series[0].name = newType == 1 ? '累计确诊' : '当日新增'
+    let max = Math.max(...dataList.map(v => v.value), 50)
+    max = max > 2000 ? 2000 : max // 避免差异过大
+    option.visualMap.max = max
+    myChart.setOption(option)
+})
 
 
-
-// function randomValue() {
-//     return Math.round(Math.random() * 1000);
-// }
-option = {
+let option = {
     tooltip: {
         formatter: function (params, ticket, callback) {
             return params.seriesName + '<br />' + params.name + '：' + params.value
