@@ -89,8 +89,11 @@
                     }
                 },
                 formatter: function(params) {
-                    let firstParams = params[0];
-                    return firstParams.name + '<br>' + firstParams.seriesName + '  ' + firstParams.data;
+                    let html = params[0].name + '<br>'
+                    for (const param of params) {
+                        html += param.seriesName + '  ' + param.data + '<br>'
+                    }
+                    return html
                 }
             },
             //图例-每一条数据的名字叫销量
@@ -127,7 +130,6 @@
         };
         //使用刚刚指定的配置项和数据项显示图表
         myChart.setOption(option);
-        window.o = option
     </script>
 </body>
 
