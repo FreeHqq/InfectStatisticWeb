@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>疫情统计曲线图</title>
+    <script src="./js/jquery.js"></script>
+    <script src="./js/echarts.js"></script>
+    <script src="./js/logData.js"></script>
+    <script src="./js/utils.js"></script>
+    <style>
+        body {
+            width: 800px;
+        }
+        #box {
+            width: 800px;
+            height: 500px;
+        }
+        .bottom {
+            text-align: center;
+        }
+        .bottom label {
+            margin-right: 15px;
+        }
+        .number-info {
+            display: flex;
+            flex-direction: column;
+            margin: 0 0 20px;
+        }
+        #date-picker {
+            display: block;
+            width: 300px;
+            height: 25px;
+            margin: 10px auto 15px;
+            text-align: center;
+        }
+        .number-wrapper {
+            display: flex;
+        }
+        .number-item {
+            display: flex;
+            flex-direction: column;
+            width: 25%;
+            text-align: center;
+        }
+        .item-title {
+            font-size: 18px;
+        }
+        .item-num {
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .item-num-sub {
+            opacity: .7;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="number-info">
+        <select id="date-picker">
+            <option value="2020-02-02">2020-02-02</option>
+            <option value="2020-02-01">2020-02-01</option>
+            <option value="2020-01-31">2020-01-31</option>
+            <option value="2020-01-30">2020-01-30</option>
+            <option value="2020-01-29">2020-01-29</option>
+            <option value="2020-01-28">2020-01-28</option>
+            <option value="2020-01-27">2020-01-27</option>
+            <option value="2020-01-26">2020-01-26</option>
+            <option value="2020-01-25">2020-01-25</option>
+            <option value="2020-01-24">2020-01-24</option>
+            <option value="2020-01-23">2020-01-23</option>
+            <option value="2020-01-22">2020-01-22</option>
+            <option value="2020-01-21">2020-01-21</option>
+            <option value="2020-01-20">2020-01-20</option>
+            <option value="2020-01-19">2020-01-19</option>
+        </select>
+        <div class="number-wrapper">
+            <div class="number-item">
+                <div class="item-title">现有确诊</div>
+                <div class="item-num" style="color: #e83243;">-</div>
+                <div class="item-num-sub" style="color: #e83243;">-</div>
+            </div>
+            <div class="number-item">
+                <div class="item-title">疑似确诊</div>
+                <div class="item-num" style="color: #ff6c62;">-</div>
+                <div class="item-num-sub" style="color: #ff6c62;">-</div>
+            </div>
+            <div class="number-item">
+                <div class="item-title">累计治愈</div>
+                <div class="item-num" style="color: #10aeb6;">-</div>
+                <div class="item-num-sub" style="color: #10aeb6;">-</div>
+            </div>
+            <div class="number-item">
+                <div class="item-title">累计死亡</div>
+                <div class="item-num" style="color: #4f535b;">-</div>
+                <div class="item-num-sub" style="color: #4f535b;">-</div>
+            </div>
+        </div>
+    </div>
+    <!--为echarts准备一个容器，画图就画在里面-->
+    <div id="box"></div>
+    <div class="bottom">
+        <input type="radio" name="type" id="type-infected" value="1"><label for="type-infected">新增/累计感染</label>
+        <input type="radio" name="type" id="type-death-cure" value="2"><label for="type-death-cure">累计死亡/治愈</label>
+    </div>
+    <script>
+        const params = new URLSearchParams(location.search)
+        let province = params.get('province') || '全国'
+        
+        window.onload = function () {
+            let data = getSpecifiedData(1, province)
+            $('.item-num').eq(0).text(data.infected)
+            $('.item-num').eq(1).text(data.suspect)
+            $('.item-num').eq(2).text(data.cure)
+            $('.item-num').eq(3).text(data.death)
+            data = getSpecifiedData(2, province)
+            $('.item-num-sub').eq(0).text('+' + data.infected)
+            $('.item-num-sub').eq(1).text('+' + data.suspect)
+            $('.item-num-sub').eq(2).text('+' + data.cure)
+            $('.item-num-sub').eq(3).text('+' + data.death)
+        }
+
+        $('#date-picker').on('change', e => {
+            const newDate = e.target.value
+            let data = getSpecifiedData(1, province, newDate)
+            $('.item-num').eq(0).text(data.infected)
+            $('.item-num').eq(1).text(data.suspect)
+            $('.item-num').eq(2).text(data.cure)
+            $('.item-num').eq(3).text(data.death)
+            data = getSpecifiedData(2, province, newDate)
+            $('.item-num-sub').eq(0).text('+' + data.infected)
+            $('.item-num-sub').eq(1).text('+' + data.suspect)
+            $('.item-num-sub').eq(2).text('+' + data.cure)
+            $('.item-num-sub').eq(3).text('+' + data.death)
+        })
+        $('input[name="type"]').change(e => {
+            myChart.showLoading()
+            console.log(e);
+            
+            let data = [], legend = []
+            if (e.target.value == 1) {
+                data = [{
+                    name: '新增确诊',
+                    type: 'line',
+                    data: augmentInfectedRecord
+                }, {
+                    name: '累计确诊',
+                    type: 'line',
+                    data: aggregateInfectedRecord
+                }]
+                legend = ['新增确诊', '累计确诊']
+            } else {
+                data = [{
+                    name: '累计治愈',
+                    type: 'line',
+                    data: aggregateCureRecord
+                }, {
+                    name: '累计死亡',
+                    type: 'line',
+                    data: aggregateDeathRecord  
+                }]
+                legend = ['累计治愈', '累计死亡']
+            }
+            option.legend.data = legend
+            option.series = data
+            myChart.setOption(option, true)
+            setTimeout(() => {
+                myChart.hideLoading()
+            }, 500);
+        })
+
+
+        const augmentInfectedRecord = getStatisticData(2, 'infected', province)
+        const aggregateInfectedRecord = getStatisticData(1, 'infected', province)
+        const aggregateCureRecord = getStatisticData(1, 'cure', province)
+        const aggregateDeathRecord = getStatisticData(1, 'death', province)
+        console.log(augmentInfectedRecord, aggregateInfectedRecord, aggregateDeathRecord, aggregateCureRecord)
+            //初始化ehcharts实例
+        var myChart = echarts.init(document.getElementById("box"));
+        //指定图表的配置项和数据
+        var option = {
+            //标题
+            // title: {
+            //     text: province + '疫情统计'
+            // },
+            //工具箱
+            //保存图片
+            toolbox: {
+                show: true,
+                feature: {
+                    saveAsImage: {
+                        show: true
+                    }
+                }
+            },
+            //悬浮显示数据
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross',
+                    crossStyle: {
+                        color: '#999'
+                    }
+                },
+                formatter: function(params) {
+                    let html = params[0].name + '<br>'
+                    for (const param of params) {
+                        html += param.seriesName + '  ' + param.data + '<br>'
+                    }
+                    return html
+                }
+            },
+            //图例-每一条数据的名字叫销量
+            legend: {
+                data: ['新增确诊', '累计确诊', '累计治愈', '累计死亡'],
+                // selectedMode: 'single',
+            },
+            //x轴
+            xAxis: {
+                data: ["01.19", "01.20", "01.21", "01.22", "01.23", "01.24", "01.25", "01.26", "01.27", "01.28", "01.29", "01.30", "01.31", "02.01", "02.02"]
+            },
+            //y轴没有显式设置，根据值自动生成y轴
+            yAxis: {},
+            //数据-data是最终要显示的数据
+            series: [{
+                    name: '新增确诊',
+                    type: 'line',
+                    data: augmentInfectedRecord
+                }, {
+                    name: '累计确诊',
+                    type: 'line',
+                    data: aggregateInfectedRecord
+                }, {
+                    name: '累计治愈',
+                    type: 'line',
+                    data: aggregateCureRecord
+                }, {
+                    name: '累计死亡',
+                    type: 'line',
+                    data: aggregateDeathRecord
+                }
+
+            ]
+        };
+        //使用刚刚指定的配置项和数据项显示图表
+        myChart.setOption(option);
+    </script>
+</body>
+
+</html>
