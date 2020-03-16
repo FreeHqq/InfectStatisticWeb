@@ -26,10 +26,20 @@ body {
 }
 #date-picker {
     width: 200px;
+    height: 100%;
     text-align: center;
 }
+#btn-all {
+    font-size: 14px;
+    margin-left: 20px;
+    cursor: pointer;
+}
+#btn-all:hover {
+    color: #e45039;
+    text-decoration: underline;
+}
 .type-btn {
-    text-align: right;
+    width: 160px;
     padding: 10px 40px;
 	border: 1px solid #999;
     border-bottom: none;
@@ -38,7 +48,6 @@ body {
 	border-radius: 15px 15px 0px 0;
 	cursor: pointer;
     transition: .3s;
-    
 }
 .type-btn:hover {
     background: #f8f8f8;
@@ -46,4 +55,5 @@ body {
 .type-btn--active {
     font-weight: bold;
     background: #eee;
+    width: 200px;
 }

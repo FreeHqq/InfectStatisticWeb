@@ -5,16 +5,6 @@ let dataList = provinces.map(v => ({
     value: getSpecifiedData(1, v).infected
 }))
 
-window.onload = function () {
-    const urlParams = new URLSearchParams(location.search)
-    if (!urlParams.get('province')) {
-        location.search = '?province=全国'
-    }
-    if (urlParams.get('province') !== '全国') {
-        this.document.body.prepend(urlParams.get('province'))
-    }
-}
-
 $('#date-picker').on('change', e => {
     const newDate = e.target.value,
           type = $('.type-btn--active')[0].dataset.index
@@ -66,6 +56,17 @@ $('#augment').click(function() {
     option.visualMap.max = max
     option.title.text = date + typeText + '情况地图'
     myChart.setOption(option)
+})
+
+$('#btn-all').click(function() {
+    layer.open({
+        type: 2,
+        title: '全国疫情详细情况',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['840px', '750px'],
+        content: './province.html?province=全国'
+      }); 
 })
 
 
