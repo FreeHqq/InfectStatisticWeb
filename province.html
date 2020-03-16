@@ -19,6 +19,9 @@
         .bottom {
             text-align: center;
         }
+        .bottom label {
+            margin-right: 15px;
+        }
         .number-info {
             display: flex;
             flex-direction: column;
@@ -26,9 +29,9 @@
         }
         #date-picker {
             display: block;
-            width: 250px;
+            width: 300px;
             height: 25px;
-            margin: 10px auto;
+            margin: 10px auto 15px;
             text-align: center;
         }
         .number-wrapper {
@@ -106,7 +109,32 @@
         const params = new URLSearchParams(location.search)
         let province = params.get('province') || '全国'
         
+        window.onload = function () {
+            let data = getSpecifiedData(1, province)
+            $('.item-num').eq(0).text(data.infected)
+            $('.item-num').eq(1).text(data.suspect)
+            $('.item-num').eq(2).text(data.cure)
+            $('.item-num').eq(3).text(data.death)
+            data = getSpecifiedData(2, province)
+            $('.item-num-sub').eq(0).text('+' + data.infected)
+            $('.item-num-sub').eq(1).text('+' + data.suspect)
+            $('.item-num-sub').eq(2).text('+' + data.cure)
+            $('.item-num-sub').eq(3).text('+' + data.death)
+        }
 
+        $('#date-picker').on('change', e => {
+            const newDate = e.target.value
+            let data = getSpecifiedData(1, province, newDate)
+            $('.item-num').eq(0).text(data.infected)
+            $('.item-num').eq(1).text(data.suspect)
+            $('.item-num').eq(2).text(data.cure)
+            $('.item-num').eq(3).text(data.death)
+            data = getSpecifiedData(2, province, newDate)
+            $('.item-num-sub').eq(0).text('+' + data.infected)
+            $('.item-num-sub').eq(1).text('+' + data.suspect)
+            $('.item-num-sub').eq(2).text('+' + data.cure)
+            $('.item-num-sub').eq(3).text('+' + data.death)
+        })
         $('input[name="type"]').change(e => {
             myChart.showLoading()
             console.log(e);
