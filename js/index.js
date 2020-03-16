@@ -17,8 +17,8 @@ window.onload = function () {
 
 $('#date-picker').on('change', e => {
     const newDate = e.target.value,
-          type = $('#type-picker').val()
-          typeText = $('#type-picker')[0].selectedOptions[0].innerText
+          type = $('.type-btn--active')[0].dataset.index
+          typeText = $('.type-btn--active')[0].innerText
     dataList = provinces.map(provinceName => ({
         name: provinceName,
         value: getSpecifiedData(type, provinceName, newDate).infected
@@ -30,18 +30,39 @@ $('#date-picker').on('change', e => {
     option.title.text = newDate + typeText + '情况地图'
     myChart.setOption(option)
 })
-$('#type-picker').on('change', e => {
-    const newType = e.target.value
-          date = $('#date-picker').val()
-          typeText = $('#type-picker')[0].selectedOptions[0].innerText
+
+$('#aggregate').click(function() {
+    $('.type-btn--active').removeClass('type-btn--active')
+    $(this).addClass('type-btn--active')
+    const newType = 1
+    date = $('#date-picker').val()
+    typeText = '累计确诊'
     dataList = provinces.map(provinceName => ({
         name: provinceName,
         value: getSpecifiedData(newType, provinceName, date).infected
     }))
     option.series[0].data = dataList
-    option.series[0].name = newType == 1 ? '累计确诊' : '当日新增'
+    option.series[0].name = typeText
     let max = Math.max(...dataList.map(v => v.value), 20)
     max = max > 2000 ? 2000 : max // 避免差异过大
+    option.visualMap.max = max
+    option.title.text = date + typeText + '情况地图'
+    myChart.setOption(option)
+})
+$('#augment').click(function() {
+    $('.type-btn--active').removeClass('type-btn--active')
+    $(this).addClass('type-btn--active')
+    const newType = 2
+          date = $('#date-picker').val()
+          typeText = '当日新增'
+    dataList = provinces.map(provinceName => ({
+        name: provinceName,
+        value: getSpecifiedData(newType, provinceName, date).infected
+    }))
+    option.series[0].data = dataList
+    option.series[0].name = typeText
+    let max = Math.max(...dataList.map(v => v.value), 20)
+    max = max > 500 ? 500 : max // 避免差异过大
     option.visualMap.max = max
     option.title.text = date + typeText + '情况地图'
     myChart.setOption(option)
