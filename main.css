@@ -10,9 +10,8 @@ body {
 }
 
 #main-chart {
-    width: 600px;
-    height: 450px;
-    margin: 150px auto;
+    width: 80%;
+    height: 90%;
+    /* margin: 150px auto; */
     border: 1px solid #ddd;
 }
-/*默认长宽比0.75*/

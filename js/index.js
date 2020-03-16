@@ -102,11 +102,19 @@ let option = {
 };
 
 myChart.setOption(option);
-myChart.on('honver', function (params) {
-    alert(params.name);
-});
+// myChart.on('honver', function (params) {
+//     alert(params.name);
+// });
 
 myChart.on('click', function (params) {
     console.log(params)
-    location.href = '/html/province.html?province=' + params.data.name
+    const href = './province.html?province=' + params.data.name
+    layer.open({
+        type: 2,
+        title: params.data.name + '省疫情详细情况',
+        shadeClose: true,
+        shade: 0.8,
+        area: ['820px', '720px'],
+        content: href //iframe的url
+      }); 
 });

@@ -4,21 +4,109 @@
 <head>
     <meta charset="UTF-8">
     <title>疫情统计曲线图</title>
-    <script src="../js/jquery.js"></script>
-    <script src="../js/echarts.js"></script>
-    <script src="../js/logData.js"></script>
-    <script src="../js/utils.js"></script>
+    <script src="./js/jquery.js"></script>
+    <script src="./js/echarts.js"></script>
+    <script src="./js/logData.js"></script>
+    <script src="./js/utils.js"></script>
+    <style>
+        body {
+            width: 800px;
+        }
+        #box {
+            width: 800px;
+            height: 500px;
+        }
+        .bottom {
+            text-align: center;
+        }
+        .number-info {
+            display: flex;
+            flex-direction: column;
+            margin: 0 0 20px;
+        }
+        #date-picker {
+            display: block;
+            width: 250px;
+            height: 25px;
+            margin: 10px auto;
+            text-align: center;
+        }
+        .number-wrapper {
+            display: flex;
+        }
+        .number-item {
+            display: flex;
+            flex-direction: column;
+            width: 25%;
+            text-align: center;
+        }
+        .item-title {
+            font-size: 18px;
+        }
+        .item-num {
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .item-num-sub {
+            opacity: .7;
+            font-size: 12px;
+        }
+    </style>
 </head>
 
 <body>
+    <div class="number-info">
+        <select id="date-picker">
+            <option value="2020-02-02">2020-02-02</option>
+            <option value="2020-02-01">2020-02-01</option>
+            <option value="2020-01-31">2020-01-31</option>
+            <option value="2020-01-30">2020-01-30</option>
+            <option value="2020-01-29">2020-01-29</option>
+            <option value="2020-01-28">2020-01-28</option>
+            <option value="2020-01-27">2020-01-27</option>
+            <option value="2020-01-26">2020-01-26</option>
+            <option value="2020-01-25">2020-01-25</option>
+            <option value="2020-01-24">2020-01-24</option>
+            <option value="2020-01-23">2020-01-23</option>
+            <option value="2020-01-22">2020-01-22</option>
+            <option value="2020-01-21">2020-01-21</option>
+            <option value="2020-01-20">2020-01-20</option>
+            <option value="2020-01-19">2020-01-19</option>
+        </select>
+        <div class="number-wrapper">
+            <div class="number-item">
+                <div class="item-title">现有确诊</div>
+                <div class="item-num" style="color: #e83243;">-</div>
+                <div class="item-num-sub" style="color: #e83243;">-</div>
+            </div>
+            <div class="number-item">
+                <div class="item-title">疑似确诊</div>
+                <div class="item-num" style="color: #ff6c62;">-</div>
+                <div class="item-num-sub" style="color: #ff6c62;">-</div>
+            </div>
+            <div class="number-item">
+                <div class="item-title">累计治愈</div>
+                <div class="item-num" style="color: #10aeb6;">-</div>
+                <div class="item-num-sub" style="color: #10aeb6;">-</div>
+            </div>
+            <div class="number-item">
+                <div class="item-title">累计死亡</div>
+                <div class="item-num" style="color: #4f535b;">-</div>
+                <div class="item-num-sub" style="color: #4f535b;">-</div>
+            </div>
+        </div>
+    </div>
     <!--为echarts准备一个容器，画图就画在里面-->
-    <div id="box" style="width: 800px;height: 600px;"></div>
-    <input type="radio" name="type" id="type-infected" value="1"><label for="type-infected">新增/累计感染</label>
-    <input type="radio" name="type" id="type-death-cure" value="2"><label for="type-death-cure">累计死亡/治愈</label>
+    <div id="box"></div>
+    <div class="bottom">
+        <input type="radio" name="type" id="type-infected" value="1"><label for="type-infected">新增/累计感染</label>
+        <input type="radio" name="type" id="type-death-cure" value="2"><label for="type-death-cure">累计死亡/治愈</label>
+    </div>
     <script>
         const params = new URLSearchParams(location.search)
         let province = params.get('province') || '全国'
         
+
         $('input[name="type"]').change(e => {
             myChart.showLoading()
             console.log(e);
@@ -66,9 +154,9 @@
         //指定图表的配置项和数据
         var option = {
             //标题
-            title: {
-                text: province + '疫情统计'
-            },
+            // title: {
+            //     text: province + '疫情统计'
+            // },
             //工具箱
             //保存图片
             toolbox: {
