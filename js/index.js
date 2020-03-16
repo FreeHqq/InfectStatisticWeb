@@ -114,7 +114,7 @@ myChart.on('click', function (params) {
         title: params.data.name + '省疫情详细情况',
         shadeClose: true,
         shade: 0.8,
-        area: ['820px', '720px'],
+        area: ['840px', '750px'],
         content: href //iframe的url
       }); 
 });
