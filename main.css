@@ -10,8 +10,9 @@ body {
 }
 
 #main-chart {
-    width: 80%;
-    height: 90%;
-    /* margin: 150px auto; */
-    border: 1px solid #ddd;
+    width: 70vw;
+    height: 85vh;
+    margin: 0 auto;
+    border: 1px solid #eee;
+    box-shadow: 0 0 60px 0px #f2f2f2;
 }
